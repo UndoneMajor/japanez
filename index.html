@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>言葉の練習 — Үг сурах тоглоом</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans:wght@400;600;700&display=swap');
+
+  :root{
+    --paper:#f3ecdd;
+    --paper2:#ebe1cc;
+    --ink:#21282e;
+    --ai:#2b4a5e;
+    --ai-deep:#16303f;
+    --beni:#a6453a;
+    --beni-soft:#c97468;
+    --gold:#b08a3e;
+    --line:#cdbf9d;
+    --good:#3f6b4f;
+    --bad:#a6453a;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 10% 15%, rgba(43,74,94,0.05) 0, transparent 35%),
+      radial-gradient(circle at 90% 85%, rgba(166,69,58,0.05) 0, transparent 35%);
+    color:var(--ink);
+    font-family:'Noto Sans', sans-serif;
+    min-height:100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .stamp{
+    position:fixed;
+    top:14px; right:14px;
+    width:46px; height:46px;
+    border:2px solid var(--beni);
+    border-radius:6px;
+    color:var(--beni);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Shippori Mincho', serif;
+    font-size:20px;
+    transform:rotate(6deg);
+    opacity:.55;
+    pointer-events:none;
+    z-index:5;
+  }
+
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+    padding:22px 16px 60px;
+  }
+
+  header.top{
+    text-align:center;
+    margin-bottom:18px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+  }
+  header.top .jp{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:30px;
+    letter-spacing:.04em;
+    color:var(--ai-deep);
+  }
+  header.top .sub{
+    margin-top:4px;
+    font-size:13px;
+    letter-spacing:.08em;
+    color:var(--ai);
+    text-transform:uppercase;
+  }
+
+  /* ---------- Screen switching ---------- */
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* ---------- Home / lesson select ---------- */
+  .card{
+    background:var(--paper2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.04);
+  }
+
+  .section-label{
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ai);
+    margin:22px 0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-label::before{
+    content:'';
+    width:14px;height:1px;background:var(--gold);
+  }
+
+  .lesson-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+  }
+  .lesson-chip{
+    aspect-ratio:1;
+    border:1.5px solid var(--ai);
+    border-radius:8px;
+    background:var(--paper);
+    color:var(--ai-deep);
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:all .15s ease;
+    user-select:none;
+  }
+  .lesson-chip span{font-size:10px; font-family:'Noto Sans'; font-weight:400; display:block; margin-top:1px;}
+  .lesson-chip.selected{
+    background:var(--ai-deep);
+    color:var(--paper);
+    border-color:var(--ai-deep);
+  }
+  .lesson-actions{
+    display:flex; gap:8px; margin-top:10px;
+  }
+  .tiny-btn{
+    flex:1;
+    padding:7px 0;
+    font-size:12px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ai);
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .tiny-btn:active{background:var(--paper);}
+
+  .mode-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .mode-card{
+    border:1.5px solid var(--line);
+    background:var(--paper);
+    border-radius:10px;
+    padding:14px 10px;
+    text-align:center;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .mode-card:active{transform:scale(0.97);}
+  .mode-card .ico{font-size:22px; margin-bottom:6px; display:block;}
+  .mode-card .name{font-weight:700; font-size:14px; color:var(--ai-deep);}
+  .mode-card .desc{font-size:11px; color:#6b6253; margin-top:3px; line-height:1.4;}
+
+  .count-pill{
+    display:inline-block;
+    margin-top:14px;
+    font-size:12px;
+    color:#6b6253;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:5px 12px;
+  }
+
+  .start-btn{
+    width:100%;
+    margin-top:16px;
+    padding:14px 0;
+    background:var(--ai-deep);
+    color:var(--paper);
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.04em;
+    cursor:pointer;
+    font-family:'Noto Sans';
+  }
+  .start-btn:disabled{
+    background:#b8b2a1;
+    cursor:not-allowed;
+  }
+  .start-btn:active:not(:disabled){transform:translateY(1px);}
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:14px;
+  }
+  .back-link{
+    font-size:13px; color:var(--ai); cursor:pointer; border:none; background:none;
+    display:flex; align-items:center; gap:4px;
+  }
+  .progress-wrap{
+    flex:1; margin:0 12px;
+    height:5px; background:var(--paper2); border-radius:3px; overflow:hidden;
+  }
+  .progress-bar{height:100%; background:var(--gold); width:0%; transition:width .25s ease;}
+  .score-tag{font-size:13px; font-weight:700; color:var(--ai-deep); white-space:nowrap;}
+
+  .qcard{
+    background:var(--paper2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:30px 20px 24px;
+    text-align:center;
+    position:relative;
+    min-height:150px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .lesson-tag{
+    position:absolute; top:10px; left:14px;
+    font-size:11px; color:var(--beni); letter-spacing:.06em;
+  }
+  .timer-tag{
+    position:absolute; top:10px; right:14px;
+    font-size:13px; font-weight:700; color:var(--beni);
+  }
+  .q-kanji{
+    font-family:'Shippori Mincho', serif;
+    font-size:42px;
+    font-weight:700;
+    color:var(--ai-deep);
+    line-height:1.2;
+    word-break:keep-all;
+  }
+  .q-kana{
+    font-family:'Noto Sans JP', sans-serif;
+    font-size:16px;
+    color:var(--ai);
+    margin-top:6px;
+  }
+  .q-prompt-label{
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:#8a8068; margin-bottom:10px;
+  }
+
+  .answers{
+    display:flex; flex-direction:column; gap:10px;
+    margin-top:16px;
+  }
+  .ans-btn{
+    text-align:left;
+    padding:14px 16px;
+    border:1.5px solid var(--line);
+    background:var(--paper);
+    border-radius:9px;
+    font-size:15px;
+    color:var(--ink);
+    cursor:pointer;
+    font-family:'Noto Sans';
+    transition:all .12s ease;
+  }
+  .ans-btn:active{transform:scale(0.985);}
+  .ans-btn.correct{
+    background:#e4ede6; border-color:var(--good); color:var(--good); font-weight:700;
+  }
+  .ans-btn.wrong{
+    background:#f3e3e0; border-color:var(--bad); color:var(--bad); font-weight:700;
+  }
+  .ans-btn.disabled-other{opacity:.45; pointer-events:none;}
+
+  .next-btn{
+    width:100%;
+    margin-top:16px;
+    padding:13px 0;
+    background:var(--beni);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    display:none;
+  }
+  .next-btn.show{display:block;}
+
+  /* ---------- Flashcard mode ---------- */
+  .flash-stage{ perspective:1000px; margin-top:6px;}
+  .flash-card{
+    background:var(--paper2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    min-height:220px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding:24px;
+    cursor:pointer;
+    position:relative;
+  }
+  .flash-card .lesson-tag{position:absolute; top:10px; left:14px;}
+  .flash-front .kanji{font-family:'Shippori Mincho',serif; font-size:40px; font-weight:700; color:var(--ai-deep);}
+  .flash-front .kana{font-size:16px; color:var(--ai); margin-top:8px;}
+  .flash-front .hint{font-size:11px; color:#9a9180; margin-top:18px; letter-spacing:.06em;}
+  .flash-back .mon{font-size:24px; font-weight:700; color:var(--beni); line-height:1.4;}
+  .flash-back .kanji-small{font-family:'Shippori Mincho',serif; font-size:18px; color:var(--ai); margin-top:10px;}
+  .flash-back .kana-small{font-size:13px; color:var(--ai); margin-top:2px;}
+
+  .flash-nav{
+    display:flex; gap:10px; margin-top:16px;
+  }
+  .flash-nav button{
+    flex:1; padding:12px 0;
+    border:1.5px solid var(--line);
+    background:var(--paper);
+    color:var(--ai-deep);
+    border-radius:8px;
+    font-size:14px; font-weight:600;
+    cursor:pointer;
+  }
+  .flash-nav button.know{border-color:var(--good); color:var(--good);}
+  .flash-nav button.dont{border-color:var(--bad); color:var(--bad);}
+  .flash-counter{
+    text-align:center; font-size:13px; color:#6b6253; margin-top:10px;
+  }
+
+  /* ---------- Memory match ---------- */
+  .memo-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:6px;
+  }
+  .memo-cell{
+    aspect-ratio:3/4;
+    background:var(--ai-deep);
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    padding:6px;
+    cursor:pointer;
+    font-size:12px;
+    color:var(--paper);
+    font-weight:600;
+    line-height:1.25;
+    user-select:none;
+    transition:transform .12s ease;
+  }
+  .memo-cell.kanji-face{font-family:'Shippori Mincho',serif; font-size:18px;}
+  .memo-cell.flipped{background:var(--paper); color:var(--ai-deep); border:1.5px solid var(--gold);}
+  .memo-cell.matched{background:#e4ede6; color:var(--good); border:1.5px solid var(--good); cursor:default;}
+  .memo-cell.hidden-text{color:transparent;}
+  .memo-cell::after{content:'問';font-family:'Shippori Mincho',serif;}
+  .memo-cell.flipped::after, .memo-cell.matched::after{content:none;}
+
+  .memo-stats{
+    display:flex; justify-content:space-between;
+    font-size:13px; color:#6b6253; margin-top:10px;
+  }
+
+  /* ---------- Results screen ---------- */
+  .result-card{
+    text-align:center;
+    padding:36px 20px;
+  }
+  .result-card .big{
+    font-family:'Shippori Mincho', serif;
+    font-size:48px;
+    font-weight:700;
+    color:var(--ai-deep);
+  }
+  .result-card .label{font-size:14px; color:#6b6253; margin-top:4px;}
+  .result-card .msg{margin-top:14px; font-size:15px; color:var(--ink);}
+  .result-actions{display:flex; gap:10px; margin-top:22px;}
+  .result-actions button{flex:1;}
+
+  .miss-list{
+    margin-top:18px; text-align:left;
+    border-top:1px solid var(--line);
+    padding-top:14px;
+  }
+  .miss-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:7px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:13px;
+  }
+  .miss-row .jp{font-family:'Shippori Mincho',serif; color:var(--ai-deep); font-weight:700;}
+  .miss-row .mn{color:var(--beni);}
+
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<div class="stamp">語</div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="jp">言葉の練習</div>
+    <div class="sub">Minna no Nihongo · 1–8 課 · Үг сурах тоглоом</div>
+  </header>
+
+  <!-- ============ HOME SCREEN ============ -->
+  <div class="screen active" id="screen-home">
+    <div class="card">
+      <div class="section-label">Хичээл сонгох (1–8 課)</div>
+      <div class="lesson-grid" id="lessonGrid"></div>
+      <div class="lesson-actions">
+        <button class="tiny-btn" id="selectAllBtn">Бүгдийг сонгох</button>
+        <button class="tiny-btn" id="selectNoneBtn">Цэвэрлэх</button>
+      </div>
+      <div class="count-pill" id="wordCount">0 үг сонгогдсон</div>
+
+      <div class="section-label">Горим сонгох</div>
+      <div class="mode-grid" id="modeGrid">
+        <div class="mode-card" data-mode="quiz">
+          <span class="ico">問</span>
+          <div class="name">Сонголттой тест</div>
+          <div class="desc">4 хариултаас зөв нэгийг сонго</div>
+        </div>
+        <div class="mode-card" data-mode="flash">
+          <span class="ico">片</span>
+          <div class="name">Карт (Flashcard)</div>
+          <div class="desc">Дарж эргүүлэн санах</div>
+        </div>
+        <div class="mode-card" data-mode="timer">
+          <span class="ico">時</span>
+          <div class="name">Хугацаатай</div>
+          <div class="desc">10 секундын дотор хариула</div>
+        </div>
+        <div class="mode-card" data-mode="memory">
+          <span class="ico">対</span>
+          <div class="name">Хос олох</div>
+          <div class="desc">Үг ба орчуулгыг хослуул</div>
+        </div>
+      </div>
+
+      <button class="start-btn" id="startBtn" disabled>Хичээл болон горим сонгоно уу</button>
+    </div>
+  </div>
+
+  <!-- ============ QUIZ / TIMER SCREEN ============ -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-top">
+      <button class="back-link" id="quizBack">← Буцах</button>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="score-tag" id="scoreTag">0/0</div>
+    </div>
+    <div class="qcard">
+      <div class="lesson-tag" id="qLessonTag"></div>
+      <div class="timer-tag hidden" id="timerTag">10</div>
+      <div class="q-prompt-label" id="qPromptLabel">Энэ үгийн монгол орчуулга?</div>
+      <div class="q-kanji" id="qKanji">―</div>
+      <div class="q-kana" id="qKana"></div>
+    </div>
+    <div class="answers" id="answersBox"></div>
+    <button class="next-btn" id="nextBtn">Дараах →</button>
+  </div>
+
+  <!-- ============ FLASHCARD SCREEN ============ -->
+  <div class="screen" id="screen-flash">
+    <div class="quiz-top">
+      <button class="back-link" id="flashBack">← Буцах</button>
+      <div class="progress-wrap"><div class="progress-bar" id="flashProgressBar"></div></div>
+    </div>
+    <div class="flash-stage">
+      <div class="flash-card" id="flashCard">
+        <div class="lesson-tag" id="flashLessonTag"></div>
+        <div class="flash-front" id="flashFront">
+          <div class="kanji" id="flashKanji">―</div>
+          <div class="kana" id="flashKana"></div>
+          <div class="hint">Дарж орчуулгыг харах</div>
+        </div>
+        <div class="flash-back hidden" id="flashBack2">
+          <div class="mon" id="flashMon"></div>
+          <div class="kanji-small" id="flashKanjiSmall"></div>
+          <div class="kana-small" id="flashKanaSmall"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flash-nav">
+      <button class="dont" id="flashDont">Дахин үзэх</button>
+      <button class="know" id="flashKnow">Мэдлээ ✓</button>
+    </div>
+    <div class="flash-counter" id="flashCounter"></div>
+  </div>
+
+  <!-- ============ MEMORY MATCH SCREEN ============ -->
+  <div class="screen" id="screen-memory">
+    <div class="quiz-top">
+      <button class="back-link" id="memoryBack">← Буцах</button>
+      <div class="score-tag" id="memoryMovesTag">0 оролдлого</div>
+    </div>
+    <div class="memo-grid" id="memoGrid"></div>
+    <div class="memo-stats">
+      <span id="memoMatchedTag">0/0 хос олдсон</span>
+    </div>
+  </div>
+
+  <!-- ============ RESULTS SCREEN ============ -->
+  <div class="screen" id="screen-result">
+    <div class="card result-card">
+      <div class="label">Дүн</div>
+      <div class="big" id="resultBig">0/0</div>
+      <div class="msg" id="resultMsg"></div>
+      <div class="result-actions">
+        <button class="tiny-btn" id="retryBtn" style="padding:13px 0;">Дахин эхлэх</button>
+        <button class="start-btn" id="homeBtn" style="margin-top:0;">Нүүр хуудас</button>
+      </div>
+      <div class="miss-list hidden" id="missList">
+        <div class="section-label" style="margin-top:0;">Дахин үзэх үгс</div>
+        <div id="missRows"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   VOCABULARY DATA — みんなの日本語 言葉 第1〜5課
+   ============================================================ */
+const VOCAB = [
+// ---------------- LESSON 1 ----------------
+{l:1,k:"私",h:"わたし",m:"би"},
+{l:1,k:"私たち",h:"わたしたち",m:"бид нар"},
+{l:1,k:"あなた",h:"あなた",m:"чи / та"},
+{l:1,k:"あの人",h:"あのひと",m:"тэр хүн"},
+{l:1,k:"あの方",h:"あのかた",m:"тэр хүн (хүндэтгэлтэй)"},
+{l:1,k:"皆さん",h:"みなさん",m:"та бүгд"},
+{l:1,k:"さん",h:"さん",m:"хүндэтгэлийн дагавар (нэрийн ард)"},
+{l:1,k:"ちゃん",h:"ちゃん",m:"эрхлүүлсэн дагавар (бяцхан хүүхдийн нэрэнд)"},
+{l:1,k:"くん",h:"くん",m:"залуу эрэгтэйд хэрэглэх дагавар"},
+{l:1,k:"じん",h:"じん",m:"иргэн, хүн (улсын нэрийн ард)"},
+{l:1,k:"先生",h:"せんせい",m:"багш"},
+{l:1,k:"教師",h:"きょうし",m:"багш (мэргэжил)"},
+{l:1,k:"学生",h:"がくせい",m:"оюутан"},
+{l:1,k:"会社員",h:"かいしゃいん",m:"компанийн ажилтан"},
+{l:1,k:"社員",h:"しゃいん",m:"ажилтан"},
+{l:1,k:"銀行員",h:"ぎんこういん",m:"банкны ажилтан"},
+{l:1,k:"医者",h:"いしゃ",m:"эмч"},
+{l:1,k:"研究者",h:"けんきゅうしゃ",m:"судлаач"},
+{l:1,k:"エンジニア",h:"エンジニア",m:"инженер"},
+{l:1,k:"大学",h:"だいがく",m:"их сургуул"},
+{l:1,k:"病院",h:"びょういん",m:"эмнэлэг"},
+{l:1,k:"電気",h:"でんき",m:"цахилгаан"},
+{l:1,k:"誰",h:"だれ",m:"хэн"},
+{l:1,k:"どなた",h:"どなた",m:"хэн (хүндэтгэлтэй)"},
+{l:1,k:"さい",h:"さい",m:"нас (тоологч)"},
+{l:1,k:"何歳",h:"なんさい",m:"хэдэн настай"},
+{l:1,k:"おいくつ",h:"おいくつ",m:"хэдэн настай (хүндэтгэлтэй)"},
+{l:1,k:"はい",h:"はい",m:"тийм"},
+{l:1,k:"いいえ",h:"いいえ",m:"үгүй"},
+{l:1,k:"失礼ですが、お名前は？",h:"しつれいですが、おなまえは",m:"уучлаарай, нэрийг асууж болох уу?"},
+{l:1,k:"始めまして",h:"はじめまして",m:"танилцахдаа баяртай байна"},
+{l:1,k:"どうぞよろしくお願いします",h:"どうぞよろしくおねがいします",m:"сайн харьцацгаая"},
+{l:1,k:"こちらは…さんです",h:"こちらは…さんです",m:"энэ бол ноён/хатагтай …"},
+{l:1,k:"…から来ました",h:"…からきました",m:"… -аас ирсэн"},
+{l:1,k:"アメリカ",h:"アメリカ",m:"Америк"},
+{l:1,k:"イギリス",h:"イギリス",m:"Англи"},
+{l:1,k:"インド",h:"インド",m:"Энэтхэг"},
+{l:1,k:"インドネシア",h:"インドネシア",m:"Индонез"},
+{l:1,k:"韓国",h:"かんこく",m:"Солонгос"},
+{l:1,k:"タイ",h:"タイ",m:"Тайланд"},
+{l:1,k:"中国",h:"ちゅうごく",m:"Хятад"},
+{l:1,k:"ドイツ",h:"ドイツ",m:"Герман"},
+{l:1,k:"日本",h:"にほん",m:"Япон"},
+{l:1,k:"フランス",h:"フランス",m:"Франц"},
+{l:1,k:"ブラジル",h:"ブラジル",m:"Бразил"},
+{l:1,k:"桜大学",h:"さくらだいがく",m:"Сакура их сургууль (нэр)"},
+{l:1,k:"富士大学",h:"ふじだいがく",m:"Фужи их сургууль (нэр)"},
+{l:1,k:"パワー電気",h:"パワーでんき",m:"Паваа цахилгаан компани (нэр)"},
+{l:1,k:"神戸病院",h:"こうべびょういん",m:"Кобэ эмнэлэг (нэр)"},
+
+// ---------------- LESSON 2 ----------------
+{l:2,k:"これ",h:"これ",m:"энэ (юм)"},
+{l:2,k:"それ",h:"それ",m:"тэр (юм, ойрхон)"},
+{l:2,k:"あれ",h:"あれ",m:"тэр (юм, хол)"},
+{l:2,k:"どれ",h:"どれ",m:"аль нь"},
+{l:2,k:"この",h:"この",m:"энэ (+ нэр үг)"},
+{l:2,k:"その",h:"その",m:"тэр (+ нэр үг, ойрхон)"},
+{l:2,k:"あの",h:"あの",m:"тэр (+ нэр үг, хол)"},
+{l:2,k:"どの",h:"どの",m:"аль (+ нэр үг)"},
+{l:2,k:"本",h:"ほん",m:"ном"},
+{l:2,k:"辞書",h:"じしょ",m:"толь бичиг"},
+{l:2,k:"雑誌",h:"ざっし",m:"сэтгүүл"},
+{l:2,k:"新聞",h:"しんぶん",m:"сонин"},
+{l:2,k:"ノート",h:"ノート",m:"тэмдэглэлийн дэвтэр"},
+{l:2,k:"手帳",h:"てちょう",m:"гарын дэвтэр"},
+{l:2,k:"名刺",h:"めいし",m:"нэрийн хуудас"},
+{l:2,k:"カード",h:"カード",m:"карт"},
+{l:2,k:"テレホンカード",h:"テレホンカード",m:"утасны карт"},
+{l:2,k:"鉛筆",h:"えんぴつ",m:"харандаа"},
+{l:2,k:"ボールペン",h:"ボールペン",m:"бал"},
+{l:2,k:"シャープペンシル",h:"シャープペンシル",m:"механик харандаа"},
+{l:2,k:"かぎ",h:"かぎ",m:"түлхүүр"},
+{l:2,k:"時計",h:"とけい",m:"цаг"},
+{l:2,k:"傘",h:"かさ",m:"шүхэр"},
+{l:2,k:"かばん",h:"かばん",m:"цүнх"},
+{l:2,k:"カセットテープ",h:"カセットテープ",m:"кассет хальс"},
+{l:2,k:"テープレコーダー",h:"テープレコーダー",m:"хальс бичигч (магнитофон)"},
+{l:2,k:"テレビ",h:"テレビ",m:"телевиз"},
+{l:2,k:"ラジオ",h:"ラジオ",m:"радио"},
+{l:2,k:"カメラ",h:"カメラ",m:"камер"},
+{l:2,k:"コンピューター",h:"コンピューター",m:"компьютер"},
+{l:2,k:"じどうしゃ",h:"じどうしゃ",m:"машин (автомашин)"},
+{l:2,k:"机",h:"つくえ",m:"ширээ"},
+{l:2,k:"椅子",h:"いす",m:"сандал"},
+{l:2,k:"チョコレート",h:"チョコレート",m:"шоколад"},
+{l:2,k:"コーヒー",h:"コーヒー",m:"кофе"},
+{l:2,k:"英語",h:"えいご",m:"англи хэл"},
+{l:2,k:"日本語",h:"にほんご",m:"япон хэл"},
+{l:2,k:"語",h:"ご",m:"хэл (дагавар, тухайлбал フランス語)"},
+{l:2,k:"何",h:"なん",m:"юу"},
+{l:2,k:"そう",h:"そう",m:"тийм (тохирол)"},
+{l:2,k:"違います",h:"ちがいます",m:"буруу, өөр байна"},
+{l:2,k:"そうですか",h:"そうですか",m:"тийм үү"},
+{l:2,k:"あのう",h:"あのう",m:"өө… (эргэлзэх үед хэлэх үг)"},
+{l:2,k:"本の気持ちです",h:"ほんのきもちです",m:"энэ зүгээр л дурсамж/бэлэг гэсэн санаа"},
+{l:2,k:"どうぞ",h:"どうぞ",m:"авна уу (санал болгох үед)"},
+{l:2,k:"どうも",h:"どうも",m:"баярлалаа (товчоор)"},
+{l:2,k:"どうもありがとうございます",h:"どうもありがとうございます",m:"маш их баярлалаа"},
+{l:2,k:"これからお世話になります",h:"これからおせわになります",m:"цаашид тантай хамт ажиллаж/амьдрахдаа баяртай байна"},
+{l:2,k:"こちらこそよろしく",h:"こちらこそよろしく",m:"харин надад ч таалагдаж байна (харилцан мэндчилгээ)"},
+
+// ---------------- LESSON 3 ----------------
+{l:3,k:"ここ",h:"ここ",m:"энд"},
+{l:3,k:"そこ",h:"そこ",m:"тэнд (ойрхон)"},
+{l:3,k:"あそこ",h:"あそこ",m:"тэнд (хол)"},
+{l:3,k:"どこ",h:"どこ",m:"хаана"},
+{l:3,k:"こちら",h:"こちら",m:"энэ тал (хүндэтгэлтэй)"},
+{l:3,k:"そちら",h:"そちら",m:"тэр тал (ойрхон)"},
+{l:3,k:"あちら",h:"あちら",m:"тэр тал (хол)"},
+{l:3,k:"どちら",h:"どちら",m:"аль тал"},
+{l:3,k:"教室",h:"きょうしつ",m:"анги, танхим"},
+{l:3,k:"食堂",h:"しょくどう",m:"хоолны газар"},
+{l:3,k:"事務所",h:"じむしょ",m:"алба, оффис"},
+{l:3,k:"会議室",h:"かいぎしつ",m:"хурлын танхим"},
+{l:3,k:"受付",h:"うけつけ",m:"хүлээн авах газар"},
+{l:3,k:"ロビー",h:"ロビー",m:"лобби"},
+{l:3,k:"へや",h:"へや",m:"өрөө"},
+{l:3,k:"トイレ",h:"トイレ",m:"бие засах газар"},
+{l:3,k:"お手洗い",h:"おてあらい",m:"бие засах газар (хүндэтгэлтэй)"},
+{l:3,k:"階段",h:"かいだん",m:"шат"},
+{l:3,k:"エレベーター",h:"エレベーター",m:"цахилгаан шат (лифт)"},
+{l:3,k:"エスカレーター",h:"エスカレーター",m:"явдаг шат"},
+{l:3,k:"お国",h:"おくに",m:"улс (хүндэтгэлтэй)"},
+{l:3,k:"会社",h:"かいしゃ",m:"компани"},
+{l:3,k:"うち",h:"うち",m:"гэр"},
+{l:3,k:"電話",h:"でんわ",m:"утас"},
+{l:3,k:"靴",h:"くつ",m:"гутал"},
+{l:3,k:"ネクタイ",h:"ネクタイ",m:"зангиа"},
+{l:3,k:"ワイン",h:"ワイン",m:"дарс"},
+{l:3,k:"タバコ",h:"タバコ",m:"тамхи"},
+{l:3,k:"売り場",h:"うりば",m:"худалдаалах хэсэг"},
+{l:3,k:"地下",h:"ちか",m:"газар доорхи"},
+{l:3,k:"かい / がい",h:"かい / がい",m:"давхар (тоологч)"},
+{l:3,k:"何階",h:"なんがい",m:"хэдэн давхар"},
+{l:3,k:"円",h:"えん",m:"иен"},
+{l:3,k:"いくら",h:"いくら",m:"хэд вэ (үнэ)"},
+{l:3,k:"百",h:"ひゃく",m:"зуу (100)"},
+{l:3,k:"千",h:"せん",m:"мянга (1000)"},
+{l:3,k:"万",h:"まん",m:"түмэн (10,000)"},
+{l:3,k:"すみません",h:"すみません",m:"уучлаарай"},
+{l:3,k:"…でございます",h:"…でございます",m:"… байна (маш хүндэтгэлтэй хэлбэр)"},
+{l:3,k:"「を」見せてください",h:"「を」みせてください",m:"…-ыг харуулаач"},
+{l:3,k:"じゃ…ください",h:"じゃ…ください",m:"тэгвэл … өгөөч"},
+{l:3,k:"イタリア",h:"イタリア",m:"Итали"},
+{l:3,k:"スイス",h:"スイス",m:"Швейцарь"},
+
+// ---------------- LESSON 4 ----------------
+{l:4,k:"起きます",h:"おきます",m:"босох, сэрэх"},
+{l:4,k:"寝ます",h:"ねます",m:"унтах"},
+{l:4,k:"働きます",h:"はたらきます",m:"ажиллах"},
+{l:4,k:"休みます",h:"やすみます",m:"амрах"},
+{l:4,k:"勉強します",h:"べんきょうします",m:"хичээллэх"},
+{l:4,k:"終わります",h:"おわります",m:"дуусах"},
+{l:4,k:"デパート",h:"デパート",m:"их дэлгүүр"},
+{l:4,k:"銀行",h:"ぎんこう",m:"банк"},
+{l:4,k:"郵便局",h:"ゆうびんきょく",m:"шуудангийн алба"},
+{l:4,k:"図書館",h:"としょかん",m:"номын сан"},
+{l:4,k:"美術館",h:"びじゅつかん",m:"урлагийн музей"},
+{l:4,k:"今",h:"いま",m:"одоо"},
+{l:4,k:"時",h:"じ",m:"цаг (тоологч)"},
+{l:4,k:"分",h:"ふん / ぷん",m:"минут (тоологч)"},
+{l:4,k:"半",h:"はん",m:"хагас"},
+{l:4,k:"何時",h:"なんじ",m:"хэдэн цаг"},
+{l:4,k:"何分",h:"なんぷん",m:"хэдэн минут"},
+{l:4,k:"午前",h:"ごぜん",m:"үдээс өмнө"},
+{l:4,k:"午後",h:"ごご",m:"үдээс хойш"},
+{l:4,k:"朝",h:"あさ",m:"өглөө"},
+{l:4,k:"昼",h:"ひる",m:"өдөр (үд)"},
+{l:4,k:"晩",h:"ばん",m:"орой"},
+{l:4,k:"夜",h:"よる",m:"шөнө"},
+{l:4,k:"おととい",h:"おととい",m:"уржигдар"},
+{l:4,k:"昨日",h:"きのう",m:"өчигдөр"},
+{l:4,k:"今日",h:"きょう",m:"өнөөдөр"},
+{l:4,k:"明日",h:"あした",m:"маргааш"},
+{l:4,k:"あさって",h:"あさって",m:"нөгөөдөр"},
+{l:4,k:"今朝",h:"けさ",m:"өнөөдрийн өглөө"},
+{l:4,k:"今晩",h:"こんばん",m:"өнөө орой"},
+{l:4,k:"休み",h:"やすみ",m:"амралт"},
+{l:4,k:"昼休み",h:"ひるやすみ",m:"үдийн завсарлага"},
+{l:4,k:"毎朝",h:"まいあさ",m:"өглөө бүр"},
+{l:4,k:"毎晩",h:"まいばん",m:"орой бүр"},
+{l:4,k:"毎日",h:"まいにち",m:"өдөр бүр"},
+{l:4,k:"月曜日",h:"げつようび",m:"даваа гараг"},
+{l:4,k:"火曜日",h:"かようび",m:"мягмар гараг"},
+{l:4,k:"水曜日",h:"すいようび",m:"лхагва гараг"},
+{l:4,k:"木曜日",h:"もくようび",m:"пүрэв гараг"},
+{l:4,k:"金曜日",h:"きんようび",m:"баасан гараг"},
+{l:4,k:"土曜日",h:"どようび",m:"бямба гараг"},
+{l:4,k:"日曜日",h:"にちようび",m:"ням гараг"},
+{l:4,k:"何曜日",h:"なんようび",m:"ямар гараг"},
+{l:4,k:"番号",h:"ばんごう",m:"дугаар"},
+{l:4,k:"何番",h:"なんばん",m:"хэдэн дугаар"},
+{l:4,k:"から",h:"から",m:"-аас (эхлэл)"},
+{l:4,k:"まで",h:"まで",m:"хүртэл"},
+{l:4,k:"と",h:"と",m:"ба, болон (холбоос)"},
+{l:4,k:"大変ですね",h:"たいへんですね",m:"хэцүү байна шүү"},
+{l:4,k:"えーと",h:"えーと",m:"өө… (бодож байгаа үед)"},
+{l:4,k:"お願いします",h:"おねがいします",m:"гуйя"},
+{l:4,k:"かしこまりました",h:"かしこまりました",m:"ойлгосон (маш хүндэтгэлтэй)"},
+{l:4,k:"いちれいよん",h:"いちれいよん",m:"1-0-4 (утасны дугаарыг тоо тус бүрээр унших жишээ)"},
+{l:4,k:"お問い合わせの番号",h:"おといあわせのばんごう",m:"лавлагааны дугаар"},
+{l:4,k:"どうもありがとうございました",h:"どうもありがとうございました",m:"маш их баярлалаа (өнгөрсөн цагаар, ярианы төгсгөлд)"},
+
+// ---------------- LESSON 5 ----------------
+{l:5,k:"行きます",h:"いきます",m:"явах"},
+{l:5,k:"来ます",h:"きます",m:"ирэх"},
+{l:5,k:"帰ります",h:"かえります",m:"буцах, гэртээ харих"},
+{l:5,k:"学校",h:"がっこう",m:"сургууль"},
+{l:5,k:"スーパー",h:"スーパー",m:"супермаркет"},
+{l:5,k:"駅",h:"えき",m:"өртөө (галт тэргэний)"},
+{l:5,k:"飛行機",h:"ひこうき",m:"онгоц"},
+{l:5,k:"船",h:"ふね",m:"хөлөг (усан онгоц)"},
+{l:5,k:"電車",h:"でんしゃ",m:"цахилгаан галт тэрэг"},
+{l:5,k:"地下鉄",h:"ちかてつ",m:"метро"},
+{l:5,k:"新幹線",h:"しんかんせん",m:"шинкансен (хурдны галт тэрэг)"},
+{l:5,k:"バス",h:"バス",m:"автобус"},
+{l:5,k:"タクシー",h:"タクシー",m:"такси"},
+{l:5,k:"自転車",h:"じてんしゃ",m:"дугуй"},
+{l:5,k:"歩いて",h:"あるいて",m:"явганаар"},
+{l:5,k:"人",h:"ひと",m:"хүн"},
+{l:5,k:"友達",h:"ともだち",m:"найз"},
+{l:5,k:"彼",h:"かれ",m:"тэр (эрэгтэй)"},
+{l:5,k:"彼女",h:"かのじょ",m:"тэр (эмэгтэй)"},
+{l:5,k:"家族",h:"かぞく",m:"гэр бүл"},
+{l:5,k:"一人で",h:"ひとりで",m:"ганцаараа"},
+{l:5,k:"先週",h:"せんしゅう",m:"өнгөрсөн долоо хоног"},
+{l:5,k:"今週",h:"こんしゅう",m:"энэ долоо хоног"},
+{l:5,k:"来週",h:"らいしゅう",m:"ирэх долоо хоног"},
+{l:5,k:"先月",h:"せんげつ",m:"өнгөрсөн сар"},
+{l:5,k:"今月",h:"こんげつ",m:"энэ сар"},
+{l:5,k:"来月",h:"らいげつ",m:"ирэх сар"},
+{l:5,k:"去年",h:"きょねん",m:"өнгөрсөн жил"},
+{l:5,k:"今年",h:"ことし",m:"энэ жил"},
+{l:5,k:"来年",h:"らいねん",m:"ирэх жил"},
+{l:5,k:"月",h:"がつ",m:"сар (тоологч)"},
+{l:5,k:"何月",h:"なんがつ",m:"хэдэн сар"},
+{l:5,k:"一日",h:"ついたち",m:"сарын 1-ний өдөр"},
+{l:5,k:"二日",h:"ふつか",m:"сарын 2-ны өдөр"},
+{l:5,k:"三日",h:"みっか",m:"сарын 3-ны өдөр"},
+{l:5,k:"四日",h:"よっか",m:"сарын 4-ний өдөр"},
+{l:5,k:"五日",h:"いつか",m:"сарын 5-ны өдөр"},
+{l:5,k:"六日",h:"むいか",m:"сарын 6-ны өдөр"},
+{l:5,k:"七日",h:"なのか",m:"сарын 7-ны өдөр"},
+{l:5,k:"八日",h:"ようか",m:"сарын 8-ны өдөр"},
+{l:5,k:"九日",h:"ここのか",m:"сарын 9-ний өдөр"},
+{l:5,k:"十日",h:"とおか",m:"сарын 10-ны өдөр"},
+{l:5,k:"十四日",h:"じゅうよっか",m:"сарын 14-ний өдөр"},
+{l:5,k:"二十日",h:"はつか",m:"сарын 20-ны өдөр"},
+{l:5,k:"二十四日",h:"にじゅうよっか",m:"сарын 24-ний өдөр"},
+{l:5,k:"日",h:"にち",m:"өдөр (тоологч)"},
+{l:5,k:"何日",h:"なんにち",m:"хэдэн өдөр / хэдний өдөр"},
+{l:5,k:"いつ",h:"いつ",m:"хэзээ"},
+{l:5,k:"誕生日",h:"たんじょうび",m:"төрсөн өдөр"},
+{l:5,k:"普通",h:"ふつう",m:"энгийн (галт тэрэг)"},
+{l:5,k:"急行",h:"きゅうこう",m:"шуурхай галт тэрэг"},
+{l:5,k:"特急",h:"とっきゅう",m:"онцгой шуурхай галт тэрэг"},
+{l:5,k:"次の",h:"つぎの",m:"дараагийн"},
+{l:5,k:"どういたしまして",h:"どういたしまして",m:"зүгээр (баярлалаа гэхэд хариулах)"},
+{l:5,k:"番線",h:"ばんせん",m:"тавцангийн дугаар"},
+{l:5,k:"博多",h:"はかた",m:"Хаката (станцын нэр)"},
+{l:5,k:"伏見",h:"ふしみ",m:"Фушими (газрын нэр)"},
+{l:5,k:"甲子園",h:"こうしえん",m:"Коошиэн (стадионы нэр)"},
+{l:5,k:"大阪城",h:"おおさかじょう",m:"Осака цайз"},
+
+// ---------------- LESSON 6 ----------------
+{l:6,k:"食べます",h:"たべます",m:"идэх"},
+{l:6,k:"飲みます",h:"のみます",m:"уух"},
+{l:6,k:"吸います",h:"すいます",m:"татах (тамхи татах)"},
+{l:6,k:"見ます",h:"みます",m:"харах, үзэх"},
+{l:6,k:"聞きます",h:"ききます",m:"сонсох"},
+{l:6,k:"読みます",h:"よみます",m:"унших"},
+{l:6,k:"書きます",h:"かきます",m:"бичих"},
+{l:6,k:"買います",h:"かいます",m:"худалдан авах"},
+{l:6,k:"撮ります",h:"とります",m:"зураг авах (дарах)"},
+{l:6,k:"します",h:"します",m:"хийх"},
+{l:6,k:"会います",h:"あいます",m:"уулзах"},
+{l:6,k:"ご飯",h:"ごはん",m:"будаа, хоол"},
+{l:6,k:"朝ごはん",h:"あさごはん",m:"өглөөний хоол"},
+{l:6,k:"昼ごはん",h:"ひるごはん",m:"үдийн хоол"},
+{l:6,k:"晩御飯",h:"ばんごはん",m:"оройн хоол"},
+{l:6,k:"パン",h:"パン",m:"талх"},
+{l:6,k:"卵",h:"たまご",m:"өндөг"},
+{l:6,k:"肉",h:"にく",m:"мах"},
+{l:6,k:"魚",h:"さかな",m:"загас"},
+{l:6,k:"野菜",h:"やさい",m:"хүнсний ногоо"},
+{l:6,k:"果物",h:"くだもの",m:"жимс"},
+{l:6,k:"水",h:"みず",m:"ус"},
+{l:6,k:"お茶",h:"おちゃ",m:"цай"},
+{l:6,k:"紅茶",h:"こうちゃ",m:"хар цай"},
+{l:6,k:"牛乳",h:"ぎゅうにゅう",m:"үнээний сүү"},
+{l:6,k:"ミルク",h:"ミルク",m:"сүү"},
+{l:6,k:"ジュース",h:"ジュース",m:"жүүс"},
+{l:6,k:"ビール",h:"ビール",m:"шар айраг"},
+{l:6,k:"お酒",h:"おさけ",m:"архи"},
+{l:6,k:"ビデオ",h:"ビデオ",m:"видео"},
+{l:6,k:"映画",h:"えいが",m:"кино"},
+{l:6,k:"シーディー",h:"シーディー",m:"компакт диск (CD)"},
+{l:6,k:"手紙",h:"てがみ",m:"захидал"},
+{l:6,k:"レポート",h:"レポート",m:"тайлан, эссэ"},
+{l:6,k:"写真",h:"しゃしん",m:"гэрэл зураг"},
+{l:6,k:"店",h:"みせ",m:"дэлгүүр"},
+{l:6,k:"レストラン",h:"レストラン",m:"ресторан"},
+{l:6,k:"庭",h:"にわ",m:"цэцэрлэг (гэрийн)"},
+{l:6,k:"宿題",h:"しゅくだい",m:"гэрийн даалгавар"},
+{l:6,k:"テニス",h:"テニス",m:"теннис"},
+{l:6,k:"サッカー",h:"サッカー",m:"хөл бөмбөг"},
+{l:6,k:"お花見",h:"おはなみ",m:"сакура цэцэг үзэх баяр"},
+{l:6,k:"何",h:"なに",m:"юу"},
+{l:6,k:"一緒に",h:"いっしょに",m:"хамтдаа"},
+{l:6,k:"ちょっと",h:"ちょっと",m:"бага зэрэг, түр"},
+{l:6,k:"いつも",h:"いつも",m:"үргэлж"},
+{l:6,k:"ときどき",h:"ときどき",m:"заримдаа"},
+{l:6,k:"それから",h:"それから",m:"тэгээд, дараа нь"},
+{l:6,k:"ええ",h:"ええ",m:"тийм (чөлөөтэй хэлбэр)"},
+{l:6,k:"いいですね",h:"いいですね",m:"сайн байна шүү"},
+{l:6,k:"分かりました",h:"わかりました",m:"ойлгосон"},
+{l:6,k:"何ですか",h:"なんですか",m:"юу вэ?"},
+{l:6,k:"じゃまた明日",h:"じゃまたあした",m:"тэгвэл маргааш дахин уулзана"},
+{l:6,k:"メキシコ",h:"メキシコ",m:"Мексик"},
+
+// ---------------- LESSON 7 ----------------
+{l:7,k:"切ります",h:"きります",m:"хайчлах, таслах"},
+{l:7,k:"送ります",h:"おくります",m:"илгээх"},
+{l:7,k:"あげます",h:"あげます",m:"өгөх"},
+{l:7,k:"もらいます",h:"もらいます",m:"авах (хүлээн авах)"},
+{l:7,k:"貸します",h:"かします",m:"зээлдүүлэх"},
+{l:7,k:"借ります",h:"かります",m:"зээлэх"},
+{l:7,k:"教えます",h:"おしえます",m:"заах"},
+{l:7,k:"習います",h:"ならいます",m:"сурах"},
+{l:7,k:"かけます（電話を）",h:"かけます（でんわを）",m:"утсаар залгах"},
+{l:7,k:"手",h:"て",m:"гар"},
+{l:7,k:"はし",h:"はし",m:"савх (модон сав)"},
+{l:7,k:"スプーン",h:"スプーン",m:"халбага"},
+{l:7,k:"ナイフ",h:"ナイフ",m:"хутга"},
+{l:7,k:"フォーク",h:"フォーク",m:"сэрээ"},
+{l:7,k:"はさみ",h:"はさみ",m:"хайч"},
+{l:7,k:"ファクス",h:"ファクス",m:"факс"},
+{l:7,k:"ワープロ",h:"ワープロ",m:"үг боловсруулагч машин"},
+{l:7,k:"パソコン",h:"パソコン",m:"хувийн компьютер"},
+{l:7,k:"パンチ",h:"パンチ",m:"цоолбор (баримт цоолох багаж)"},
+{l:7,k:"ホッチキス",h:"ホッチキス",m:"степлер (дэвсгэр)"},
+{l:7,k:"セロテープ",h:"セロテープ",m:"скоч (целлофан тууз)"},
+{l:7,k:"消しゴム",h:"けしゴム",m:"баллах резин"},
+{l:7,k:"紙",h:"かみ",m:"цаас"},
+{l:7,k:"花",h:"はな",m:"цэцэг"},
+{l:7,k:"シャツ",h:"シャツ",m:"цамц"},
+{l:7,k:"プレゼント",h:"プレゼント",m:"бэлэг"},
+{l:7,k:"荷物",h:"にもつ",m:"ачаа, бараа"},
+{l:7,k:"お金",h:"おかね",m:"мөнгө"},
+{l:7,k:"切符",h:"きっぷ",m:"тийз"},
+{l:7,k:"クリスマス",h:"クリスマス",m:"Зул сарын баяр"},
+{l:7,k:"父",h:"ちち",m:"аав (өөрийнхөн)"},
+{l:7,k:"母",h:"はは",m:"ээж (өөрийнхөн)"},
+{l:7,k:"お父さん",h:"おとうさん",m:"аав (бусдын, хүндэтгэлтэй)"},
+{l:7,k:"お母さん",h:"おかあさん",m:"ээж (бусдын, хүндэтгэлтэй)"},
+{l:7,k:"もう",h:"もう",m:"аль хэдийн"},
+{l:7,k:"まだ",h:"まだ",m:"хараахан, одоохондоо"},
+{l:7,k:"これから",h:"これから",m:"цаашид, одооноос"},
+{l:7,k:"すてきですね",h:"すてきですね",m:"гоё юмаа"},
+{l:7,k:"ごめんください",h:"ごめんください",m:"хэн байна? (айлчлахдаа хэлэх үг)"},
+{l:7,k:"いらっしゃい",h:"いらっしゃい",m:"тавтай морил"},
+{l:7,k:"どうぞお上がりください",h:"どうぞおあがりください",m:"орж ирээч (гэрт)"},
+{l:7,k:"失礼します",h:"しつれいします",m:"уучлаарай (орох/явахдаа)"},
+{l:7,k:"いかがですか",h:"いかがですか",m:"яасан бэ? (санал болгох)"},
+{l:7,k:"いただきます",h:"いただきます",m:"идье (хоолны өмнө хэлэх үг)"},
+{l:7,k:"旅行",h:"りょこう",m:"аялал"},
+{l:7,k:"お土産",h:"おみやげ",m:"бэлэг дурсгал"},
+{l:7,k:"ヨーロッパ",h:"ヨーロッパ",m:"Европ"},
+{l:7,k:"スペイン",h:"スペイン",m:"Испани"},
+
+// ---------------- LESSON 8 ----------------
+{l:8,k:"ハンサム",h:"ハンサム",m:"царайлаг (эрэгтэй)"},
+{l:8,k:"きれい",h:"きれい",m:"үзэсгэлэнтэй, цэвэр"},
+{l:8,k:"静か",h:"しずか",m:"тайван, чимээгүй"},
+{l:8,k:"にぎやか",h:"にぎやか",m:"хөл хөдөлгөөн ихтэй, цовоо"},
+{l:8,k:"有名",h:"ゆうめい",m:"алдартай"},
+{l:8,k:"親切",h:"しんせつ",m:"найрсаг"},
+{l:8,k:"元気",h:"げんき",m:"эрч хүчтэй, эрүүл сайхан"},
+{l:8,k:"暇",h:"ひま",m:"чөлөөтэй (завгүй биш)"},
+{l:8,k:"便利",h:"べんり",m:"хэрэглэхэд хялбар, тохиромжтой"},
+{l:8,k:"素敵",h:"すてき",m:"гоё, сайхан"},
+{l:8,k:"大きい",h:"おおきい",m:"том"},
+{l:8,k:"小さい",h:"ちいさい",m:"бага, жижиг"},
+{l:8,k:"新しい",h:"あたらしい",m:"шинэ"},
+{l:8,k:"古い",h:"ふるい",m:"хуучин"},
+{l:8,k:"いい（よい）",h:"いい（よい）",m:"сайн"},
+{l:8,k:"悪い",h:"わるい",m:"муу"},
+{l:8,k:"暑い",h:"あつい",m:"халуун (агаар)"},
+{l:8,k:"寒い",h:"さむい",m:"хүйтэн (агаар)"},
+{l:8,k:"冷たい",h:"つめたい",m:"хүйтэн (зүйл, идэх юм)"},
+{l:8,k:"難しい",h:"むずかしい",m:"хэцүү"},
+{l:8,k:"易しい",h:"やさしい",m:"хялбар"},
+{l:8,k:"高い",h:"たかい",m:"өндөр, үнэтэй"},
+{l:8,k:"安い",h:"やすい",m:"хямд"},
+{l:8,k:"低い",h:"ひくい",m:"намхан"},
+{l:8,k:"面白い",h:"おもしろい",m:"сонирхолтой"},
+{l:8,k:"おいしい",h:"おいしい",m:"амттай"},
+{l:8,k:"忙しい",h:"いそがしい",m:"завгүй"},
+{l:8,k:"楽しい",h:"たのしい",m:"хөгжилтэй"},
+{l:8,k:"白い",h:"しろい",m:"цагаан"},
+{l:8,k:"黒い",h:"くろい",m:"хар"},
+{l:8,k:"赤い",h:"あかい",m:"улаан"},
+{l:8,k:"青い",h:"あおい",m:"цэнхэр"},
+{l:8,k:"桜",h:"さくら",m:"сакура (модны нэр)"},
+{l:8,k:"山",h:"やま",m:"уул"},
+{l:8,k:"町",h:"まち",m:"хот, тосгон"},
+{l:8,k:"食べ物",h:"たべもの",m:"хоол хүнс"},
+{l:8,k:"車",h:"くるま",m:"машин"},
+{l:8,k:"所",h:"ところ",m:"газар"},
+{l:8,k:"りょう",h:"りょう",m:"дотуур байр"},
+{l:8,k:"勉強",h:"べんきょう",m:"хичээл, суралцах"},
+{l:8,k:"生活",h:"せいかつ",m:"амьдрал"},
+{l:8,k:"お仕事",h:"おしごと",m:"ажил (хүндэтгэлтэй)"},
+{l:8,k:"どう",h:"どう",m:"яаж, ямар (байдал асуух)"},
+{l:8,k:"どんな",h:"どんな",m:"ямар"},
+{l:8,k:"とても",h:"とても",m:"маш"},
+{l:8,k:"あまり",h:"あまり",m:"тэр бүр (биш) — үгүйсгэлийн өгүүлбэрт"},
+{l:8,k:"そして",h:"そして",m:"тэгээд"},
+{l:8,k:"が",h:"が",m:"гэхдээ (холбоос)"},
+{l:8,k:"お元気ですか",h:"おげんきですか",m:"сайн байна уу?"},
+{l:8,k:"そうですね",h:"そうですね",m:"тийм шүү"},
+{l:8,k:"日本の生活に慣れましたか",h:"にほんのせいかつになれましたか",m:"Японы амьдралд дассан уу?"},
+{l:8,k:"もう一杯いかがですか",h:"もういっぱいいかがですか",m:"дахиад нэг аяга авах уу?"},
+{l:8,k:"いいえ、結構です",h:"いいえ、けっこうです",m:"үгүй ээ, хэрэггүй (зайлуул)"},
+{l:8,k:"そろそろ失礼します",h:"そろそろしつれいします",m:"би тэгвэл явъя дээ"},
+{l:8,k:"またいらっしゃってください",h:"またいらっしゃってください",m:"дахин ирээрэй"},
+{l:8,k:"富士山",h:"ふじさん",m:"Фужи уул"},
+{l:8,k:"琵琶湖",h:"びわこ",m:"Бива нуур"},
+{l:8,k:"上海",h:"しゃんはい",m:"Шанхай"},
+{l:8,k:"七人の侍",h:"しちにんのさむらい",m:"«Долоон самурай» (кино)"},
+{l:8,k:"金閣寺",h:"きんかくじ",m:"Кинкакужи (алтан сүм)"},
+];
+
+/* ============================================================
+   STATE & HELPERS
+   ============================================================ */
+let selectedLessons = new Set([1,2,3,4,5,6,7,8]);
+let currentMode = null;
+let pool = [];          // active word pool for session
+let qIndex = 0;
+let score = 0;
+let missed = [];
+let timerInterval = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function activeWords(){
+  return VOCAB.filter(w=>selectedLessons.has(w.l));
+}
+
+function updateHomeUI(){
+  const n = activeWords().length;
+  document.getElementById('wordCount').textContent = n + ' үг сонгогдсон';
+  const startBtn = document.getElementById('startBtn');
+  if(n>0 && currentMode){
+    startBtn.disabled = false;
+    startBtn.textContent = 'Эхлэх (' + n + ' үг)';
+  } else {
+    startBtn.disabled = true;
+    startBtn.textContent = currentMode ? 'Хичээл сонгоно уу' : 'Хичээл болон горим сонгоно уу';
+  }
+}
+
+/* ============================================================
+   HOME SCREEN SETUP
+   ============================================================ */
+const lessonGrid = document.getElementById('lessonGrid');
+for(let i=1;i<=8;i++){
+  const chip = document.createElement('div');
+  chip.className = 'lesson-chip selected';
+  chip.dataset.lesson = i;
+  chip.innerHTML = i + '<span>課</span>';
+  chip.addEventListener('click', ()=>{
+    if(selectedLessons.has(i)){
+      selectedLessons.delete(i);
+      chip.classList.remove('selected');
+    } else {
+      selectedLessons.add(i);
+      chip.classList.add('selected');
+    }
+    updateHomeUI();
+  });
+  lessonGrid.appendChild(chip);
+}
+
+document.getElementById('selectAllBtn').addEventListener('click', ()=>{
+  selectedLessons = new Set([1,2,3,4,5,6,7,8]);
+  document.querySelectorAll('.lesson-chip').forEach(c=>c.classList.add('selected'));
+  updateHomeUI();
+});
+document.getElementById('selectNoneBtn').addEventListener('click', ()=>{
+  selectedLessons = new Set();
+  document.querySelectorAll('.lesson-chip').forEach(c=>c.classList.remove('selected'));
+  updateHomeUI();
+});
+
+document.querySelectorAll('.mode-card').forEach(card=>{
+  card.addEventListener('click', ()=>{
+    document.querySelectorAll('.mode-card').forEach(c=>c.style.borderColor='var(--line)');
+    document.querySelectorAll('.mode-card').forEach(c=>c.style.background='var(--paper)');
+    card.style.borderColor = 'var(--ai-deep)';
+    card.style.background = '#e3e9e4'.replace('e3e9e4','eee5d3');
+    currentMode = card.dataset.mode;
+    updateHomeUI();
+  });
+});
+
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  startSession();
+});
+
+updateHomeUI();
+
+/* ============================================================
+   SESSION START ROUTER
+   ============================================================ */
+function startSession(){
+  pool = shuffle(activeWords());
+  qIndex = 0;
+  score = 0;
+  missed = [];
+
+  if(currentMode === 'quiz' || currentMode === 'timer'){
+    document.getElementById('timerTag').classList.toggle('hidden', currentMode !== 'timer');
+    showScreen('screen-quiz');
+    renderQuizQuestion();
+  } else if(currentMode === 'flash'){
+    showScreen('screen-flash');
+    renderFlashCard();
+  } else if(currentMode === 'memory'){
+    startMemoryGame();
+    showScreen('screen-memory');
+  }
+}
+
+/* ============================================================
+   QUIZ / TIMER MODE
+   ============================================================ */
+const lessonKanjiOf = w => w.l;
+
+function buildChoices(correct){
+  const wrongCandidates = activeWords().filter(w=>w.k!==correct.k);
+  const wrongs = shuffle(wrongCandidates).slice(0,3).map(w=>w.m);
+  const choices = shuffle([correct.m, ...wrongs]);
+  return choices;
+}
+
+function renderQuizQuestion(){
+  clearInterval(timerInterval);
+  if(qIndex >= pool.length){
+    finishSession();
+    return;
+  }
+  const w = pool[qIndex];
+  document.getElementById('qLessonTag').textContent = w.l + '課';
+  document.getElementById('qKanji').textContent = w.k;
+  document.getElementById('qKana').textContent = w.h !== w.k ? w.h : '';
+  document.getElementById('qPromptLabel').textContent = 'Энэ үгийн монгол орчуулга?';
+  document.getElementById('scoreTag').textContent = score + '/' + pool.length;
+  document.getElementById('progressBar').style.width = Math.round((qIndex/pool.length)*100) + '%';
+  document.getElementById('nextBtn').classList.remove('show');
+
+  const choices = buildChoices(w);
+  const box = document.getElementById('answersBox');
+  box.innerHTML = '';
+  choices.forEach(choice=>{
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = choice;
+    btn.addEventListener('click', ()=>handleAnswer(btn, choice, w));
+    box.appendChild(btn);
+  });
+
+  if(currentMode === 'timer'){
+    let t = 10;
+    const timerTag = document.getElementById('timerTag');
+    timerTag.textContent = t;
+    timerTag.style.color = 'var(--beni)';
+    timerInterval = setInterval(()=>{
+      t--;
+      timerTag.textContent = t;
+      if(t<=3) timerTag.style.color = 'var(--bad)';
+      if(t<=0){
+        clearInterval(timerInterval);
+        handleAnswer(null, null, w, true);
+      }
+    },1000);
+  }
+}
+
+function handleAnswer(btn, choice, w, timedOut){
+  clearInterval(timerInterval);
+  const allBtns = document.querySelectorAll('#answersBox .ans-btn');
+  const isCorrect = !timedOut && choice === w.m;
+  allBtns.forEach(b=>{
+    if(b.textContent === w.m){
+      b.classList.add('correct');
+    } else if(b === btn){
+      b.classList.add('wrong');
+    } else {
+      b.classList.add('disabled-other');
+    }
+  });
+  if(isCorrect){
+    score++;
+  } else {
+    missed.push(w);
+  }
+  document.getElementById('scoreTag').textContent = score + '/' + pool.length;
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  qIndex++;
+  renderQuizQuestion();
+});
+
+document.getElementById('quizBack').addEventListener('click', ()=>{
+  clearInterval(timerInterval);
+  showScreen('screen-home');
+});
+
+/* ============================================================
+   FLASHCARD MODE
+   ============================================================ */
+let flashFlipped = false;
+
+function renderFlashCard(){
+  if(qIndex >= pool.length){
+    finishSession();
+    return;
+  }
+  const w = pool[qIndex];
+  flashFlipped = false;
+  document.getElementById('flashLessonTag').textContent = w.l + '課';
+  document.getElementById('flashKanji').textContent = w.k;
+  document.getElementById('flashKana').textContent = w.h !== w.k ? w.h : '';
+  document.getElementById('flashMon').textContent = w.m;
+  document.getElementById('flashKanjiSmall').textContent = w.k;
+  document.getElementById('flashKanaSmall').textContent = w.h !== w.k ? w.h : '';
+  document.getElementById('flashFront').classList.remove('hidden');
+  document.getElementById('flashBack2').classList.add('hidden');
+  document.getElementById('flashProgressBar').style.width = Math.round((qIndex/pool.length)*100) + '%';
+  document.getElementById('flashCounter').textContent = (qIndex+1) + ' / ' + pool.length;
+}
+
+document.getElementById('flashCard').addEventListener('click', ()=>{
+  flashFlipped = !flashFlipped;
+  document.getElementById('flashFront').classList.toggle('hidden', flashFlipped);
+  document.getElementById('flashBack2').classList.toggle('hidden', !flashFlipped);
+});
+
+document.getElementById('flashKnow').addEventListener('click', ()=>{
+  score++;
+  qIndex++;
+  renderFlashCard();
+});
+document.getElementById('flashDont').addEventListener('click', ()=>{
+  missed.push(pool[qIndex]);
+  qIndex++;
+  renderFlashCard();
+});
+document.getElementById('flashBack').addEventListener('click', ()=>{
+  showScreen('screen-home');
+});
+
+/* ============================================================
+   MEMORY MATCH MODE
+   ============================================================ */
+let memoCards = [];
+let memoFlippedIdx = [];
+let memoMatchedCount = 0;
+let memoMoves = 0;
+let memoLock = false;
+
+function startMemoryGame(){
+  memoMoves = 0;
+  memoMatchedCount = 0;
+  memoFlippedIdx = [];
+  memoLock = false;
+
+  const chosen = shuffle(activeWords()).slice(0, Math.min(6, activeWords().length));
+  let cards = [];
+  chosen.forEach((w, i)=>{
+    cards.push({pairId:i, type:'jp', text:w.k, sub:w.h!==w.k?w.h:'', flipped:false, matched:false});
+    cards.push({pairId:i, type:'mn', text:w.m, flipped:false, matched:false});
+  });
+  memoCards = shuffle(cards);
+
+  document.getElementById('memoMovesTag').textContent = '0 оролдлого';
+  document.getElementById('memoMatchedTag').textContent = '0/' + chosen.length + ' хос олдсон';
+  renderMemoryGrid();
+}
+
+function renderMemoryGrid(){
+  const grid = document.getElementById('memoGrid');
+  grid.innerHTML = '';
+  memoCards.forEach((c, idx)=>{
+    const cell = document.createElement('div');
+    cell.className = 'memo-cell';
+    if(c.type==='jp') cell.classList.add('kanji-face');
+    if(c.matched){
+      cell.classList.add('matched');
+      cell.innerHTML = c.text + (c.sub ? '<br><span style="font-size:10px;">'+c.sub+'</span>' : '');
+    } else if(c.flipped){
+      cell.classList.add('flipped');
+      cell.innerHTML = c.text + (c.sub ? '<br><span style="font-size:10px;">'+c.sub+'</span>' : '');
+    } else {
+      cell.classList.add('hidden-text');
+    }
+    cell.addEventListener('click', ()=>handleMemoryClick(idx));
+    grid.appendChild(cell);
+  });
+}
+
+function handleMemoryClick(idx){
+  if(memoLock) return;
+  const c = memoCards[idx];
+  if(c.flipped || c.matched) return;
+  if(memoFlippedIdx.length === 2) return;
+
+  c.flipped = true;
+  memoFlippedIdx.push(idx);
+  renderMemoryGrid();
+
+  if(memoFlippedIdx.length === 2){
+    memoMoves++;
+    document.getElementById('memoMovesTag').textContent = memoMoves + ' оролдлого';
+    const [i1,i2] = memoFlippedIdx;
+    const c1 = memoCards[i1], c2 = memoCards[i2];
+    memoLock = true;
+    if(c1.pairId === c2.pairId && c1.type !== c2.type){
+      setTimeout(()=>{
+        c1.matched = true; c2.matched = true;
+        memoMatchedCount++;
+        const totalPairs = memoCards.length/2;
+        document.getElementById('memoMatchedTag').textContent = memoMatchedCount + '/' + totalPairs + ' хос олдсон';
+        memoFlippedIdx = [];
+        memoLock = false;
+        renderMemoryGrid();
+        if(memoMatchedCount === totalPairs){
+          setTimeout(()=>{
+            score = memoMatchedCount;
+            pool = {length: memoMatchedCount};
+            finishMemorySession();
+          }, 500);
+        }
+      }, 450);
+    } else {
+      setTimeout(()=>{
+        c1.flipped = false; c2.flipped = false;
+        memoFlippedIdx = [];
+        memoLock = false;
+        renderMemoryGrid();
+      }, 750);
+    }
+  }
+}
+
+function finishMemorySession(){
+  document.getElementById('resultBig').textContent = memoMatchedCount + ' хос';
+  document.getElementById('resultMsg').textContent = memoMoves + ' оролдлогоор бүх хосыг олсон байна.';
+  document.getElementById('missList').classList.add('hidden');
+  showScreen('screen-result');
+}
+
+document.getElementById('memoryBack').addEventListener('click', ()=>{
+  showScreen('screen-home');
+});
+
+/* ============================================================
+   FINISH / RESULTS (quiz, timer, flash)
+   ============================================================ */
+function finishSession(){
+  const total = pool.length;
+  document.getElementById('resultBig').textContent = score + '/' + total;
+  let msg;
+  const pct = total ? score/total : 0;
+  if(pct === 1) msg = 'Гайхалтай! Бүгдийг зөв хариулсан байна 🎉';
+  else if(pct >= 0.8) msg = 'Маш сайн! Бараг бүгдийг мэдэж байна.';
+  else if(pct >= 0.5) msg = 'Сайн оролдлого. Дахин үзвэл бүр сайн болно.';
+  else msg = 'Дахин давтаад үзье — мэдэх үгс цаг хугацаатай нэмэгдэнэ.';
+  document.getElementById('resultMsg').textContent = msg;
+
+  const missListEl = document.getElementById('missList');
+  if(missed.length > 0){
+    missListEl.classList.remove('hidden');
+    const rows = document.getElementById('missRows');
+    rows.innerHTML = '';
+    missed.forEach(w=>{
+      const row = document.createElement('div');
+      row.className = 'miss-row';
+      row.innerHTML = '<span class="jp">'+w.k+(w.h!==w.k?' ('+w.h+')':'')+'</span><span class="mn">'+w.m+'</span>';
+      rows.appendChild(row);
+    });
+  } else {
+    missListEl.classList.add('hidden');
+  }
+
+  showScreen('screen-result');
+}
+
+document.getElementById('retryBtn').addEventListener('click', ()=>{
+  startSession();
+});
+document.getElementById('homeBtn').addEventListener('click', ()=>{
+  showScreen('screen-home');
+});
+</script>
+</body>
+</html>
