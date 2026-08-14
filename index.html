@@ -237,6 +237,11 @@
     line-height:1.2;
     word-break:keep-all;
   }
+  .q-kanji.mn-text{
+    font-family:'Noto Sans', sans-serif;
+    font-size:21px;
+    font-weight:700;
+  }
   .q-kana{
     font-family:'Noto Sans JP', sans-serif;
     font-size:16px;
@@ -263,6 +268,11 @@
     cursor:pointer;
     font-family:'Noto Sans';
     transition:all .12s ease;
+  }
+  .ans-btn.kanji-ans{
+    font-family:'Shippori Mincho', serif;
+    font-size:20px;
+    text-align:center;
   }
   .ans-btn:active{transform:scale(0.985);}
   .ans-btn.correct{
@@ -436,6 +446,11 @@
           <span class="ico">対</span>
           <div class="name">Хос олох</div>
           <div class="desc">Үг ба орчуулгыг хослуул</div>
+        </div>
+        <div class="mode-card" data-mode="kanji">
+          <span class="ico">漢</span>
+          <div class="name">Канжи таах</div>
+          <div class="desc">Утга/уншлагаас нь зөв канжийг сонго</div>
         </div>
       </div>
 
@@ -1625,8 +1640,12 @@ function activeWords(){
   return VOCAB.filter(w=>selectedLessons.has(w.l));
 }
 
+function kanjiWords(){
+  return activeWords().filter(w=>w.k !== w.h);
+}
+
 function updateHomeUI(){
-  const n = activeWords().length;
+  const n = (currentMode === 'kanji' ? kanjiWords() : activeWords()).length;
   document.getElementById('wordCount').textContent = n + ' үг сонгогдсон';
   const startBtn = document.getElementById('startBtn');
   if(n>0 && currentMode){
@@ -1692,12 +1711,13 @@ updateHomeUI();
    SESSION START ROUTER
    ============================================================ */
 function startSession(){
-  pool = shuffle(activeWords());
+  const sourceWords = currentMode === 'kanji' ? kanjiWords() : activeWords();
+  pool = shuffle(sourceWords);
   qIndex = 0;
   score = 0;
   missed = [];
 
-  if(currentMode === 'quiz' || currentMode === 'timer'){
+  if(currentMode === 'quiz' || currentMode === 'timer' || currentMode === 'kanji'){
     document.getElementById('timerTag').classList.toggle('hidden', currentMode !== 'timer');
     showScreen('screen-quiz');
     renderQuizQuestion();
@@ -1711,14 +1731,27 @@ function startSession(){
 }
 
 /* ============================================================
-   QUIZ / TIMER MODE
+   QUIZ / TIMER / KANJI MODE
    ============================================================ */
-const lessonKanjiOf = w => w.l;
+function correctAnswerText(w){
+  return currentMode === 'kanji' ? w.k : w.m;
+}
 
 function buildChoices(correct){
-  const wrongCandidates = activeWords().filter(w=>w.k!==correct.k);
-  const wrongs = shuffle(wrongCandidates).slice(0,3).map(w=>w.m);
-  const choices = shuffle([correct.m, ...wrongs]);
+  const isKanjiMode = currentMode === 'kanji';
+  const key = isKanjiMode ? 'k' : 'm';
+  const source = isKanjiMode ? kanjiWords() : activeWords();
+  const wrongCandidates = shuffle(source.filter(w=>w.k!==correct.k));
+  const seen = new Set([correct[key]]);
+  const wrongs = [];
+  for(const w of wrongCandidates){
+    if(!seen.has(w[key])){
+      seen.add(w[key]);
+      wrongs.push(w[key]);
+      if(wrongs.length === 3) break;
+    }
+  }
+  const choices = shuffle([correct[key], ...wrongs]);
   return choices;
 }
 
@@ -1729,10 +1762,20 @@ function renderQuizQuestion(){
     return;
   }
   const w = pool[qIndex];
+  const isKanjiMode = currentMode === 'kanji';
+  const qKanjiEl = document.getElementById('qKanji');
+
   document.getElementById('qLessonTag').textContent = w.l + '課';
-  document.getElementById('qKanji').textContent = w.k;
-  document.getElementById('qKana').textContent = w.h !== w.k ? w.h : '';
-  document.getElementById('qPromptLabel').textContent = 'Энэ үгийн монгол орчуулга?';
+  qKanjiEl.classList.toggle('mn-text', isKanjiMode);
+  if(isKanjiMode){
+    qKanjiEl.textContent = w.m;
+    document.getElementById('qKana').textContent = '';
+    document.getElementById('qPromptLabel').textContent = 'Энэ утгатай тохирох канжийг сонго';
+  } else {
+    qKanjiEl.textContent = w.k;
+    document.getElementById('qKana').textContent = w.h !== w.k ? w.h : '';
+    document.getElementById('qPromptLabel').textContent = 'Энэ үгийн монгол орчуулга?';
+  }
   document.getElementById('scoreTag').textContent = score + '/' + pool.length;
   document.getElementById('progressBar').style.width = Math.round((qIndex/pool.length)*100) + '%';
   document.getElementById('nextBtn').classList.remove('show');
@@ -1742,7 +1785,7 @@ function renderQuizQuestion(){
   box.innerHTML = '';
   choices.forEach(choice=>{
     const btn = document.createElement('button');
-    btn.className = 'ans-btn';
+    btn.className = 'ans-btn' + (isKanjiMode ? ' kanji-ans' : '');
     btn.textContent = choice;
     btn.addEventListener('click', ()=>handleAnswer(btn, choice, w));
     box.appendChild(btn);
@@ -1767,10 +1810,11 @@ function renderQuizQuestion(){
 
 function handleAnswer(btn, choice, w, timedOut){
   clearInterval(timerInterval);
+  const correctText = correctAnswerText(w);
   const allBtns = document.querySelectorAll('#answersBox .ans-btn');
-  const isCorrect = !timedOut && choice === w.m;
+  const isCorrect = !timedOut && choice === correctText;
   allBtns.forEach(b=>{
-    if(b.textContent === w.m){
+    if(b.textContent === correctText){
       b.classList.add('correct');
     } else if(b === btn){
       b.classList.add('wrong');
@@ -1946,7 +1990,7 @@ document.getElementById('memoryBack').addEventListener('click', ()=>{
 });
 
 /* ============================================================
-   FINISH / RESULTS (quiz, timer, flash)
+   FINISH / RESULTS (quiz, timer, kanji, flash)
    ============================================================ */
 function finishSession(){
   const total = pool.length;
@@ -1994,7 +2038,7 @@ document.getElementById('retryMissedBtn').addEventListener('click', ()=>{
   qIndex = 0;
   score = 0;
 
-  if(currentMode === 'quiz' || currentMode === 'timer'){
+  if(currentMode === 'quiz' || currentMode === 'timer' || currentMode === 'kanji'){
     document.getElementById('timerTag').classList.toggle('hidden', currentMode !== 'timer');
     showScreen('screen-quiz');
     renderQuizQuestion();
